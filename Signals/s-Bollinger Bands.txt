@@ -1,0 +1,64 @@
+﻿#Bollinger Bands
+
+extern int MAPeriod = 20;
+extern int BandRange1 = 1;
+extern int BandRange2 = 2;
+extern int BandRange3 = 3;
+
+
+double sma(m,n) = {p(m)+p(m+1)+p(m+2)+...+p(m+n-1)}/n; # m=0;now m=1, 1 day before, m=2 2days before
+
+double sd(m,n) = [[{p(m)-sma(m,n)}^2+{p(m+1)-sma(m,n)}^2+{p(m+2)-sma(m,n)}^2+...+{p(m+n-1)-sma(m,n)}^2]/n]^(1/2);
+
+
+bu(m,n,o) =  sma(m,n) + o * sd(m,n);
+bd(m,n,o) =  sma(m,n) - o * sd(m,n);
+
+double bu3line2 = 0;
+double bu2line2 = 0;
+double bu1line2 = 0;
+double sma2 = 0;
+double bd1line2 = 0;
+double bd2line2 = 0;
+double bd3line2 = 0;
+
+double bu3line1 = 0;
+double bu2line1 = 0;
+double bu1line1 = 0;
+double sma1 = 0;
+double bd1line1 = 0;
+double bd2line1 = 0;
+double bd3line1 = 0;
+
+int start() #When new candle bar happens, it will excute
+{
+
+ bu3line2 = bu(2,MAPeriod,BandRange3);
+ bu2line2 = bu(2,MAPeriod,BandRange2);
+ bu1line2 = bu(2,MAPeriod,BandRange1);
+ sma2 = sma(2,MAPeriod);
+ bd1line2 = bd(2,MAPeriod,BandRange1);
+ bd2line2 = bd(2,MAPeriod,BandRange2);
+ bd3line2 = bd(2,MAPeriod,BandRange3);
+
+ bu3line1 = bu(1,MAPeriod,BandRange3);
+ bu2line1 = bu(1,MAPeriod,BandRange2);
+ bu1line1 = bu(1,MAPeriod,BandRange1);
+ sma1 = sma(1,MAPeriod);
+ bd1line1 = bd(1,MAPeriod,BandRange1);
+ bd2line1 = bd(1,MAPeriod,BandRange2);
+ bd3line1 = bd(1,MAPeriod,BandRange3);
+
+      
+   //Send Signals 
+   if(   (p(2) <= bd3line2 && p(1) > bd3line1) || (p(2) <= bd2line2 && p(1) > bd2line1) || (p(2) <= bd1line2 && p(1) > bd1line1) || (p(2) <= bu1line2 && p(1) > bu1line1)|| (p(2) <= bu2line2 && p(1) > bu2line1))
+      {
+         SignalSend BUY;
+      }
+      
+   if(   (p(2) >= bu3line2 && p(1) < bu3line1) || (p(2) >= bu2line2 && p(1) < bu2line1) || (p(2) >= bu1line2 && p(1) < bu1line1) || (p(2) >= bd1line2 && p(1) < bd1line1)|| (p(2) >= bd2line2 && p(1) < bd2line1))
+      {
+         SignalSend SELL;
+      }
+      
+return(0);
