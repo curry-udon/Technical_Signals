@@ -5,11 +5,9 @@ extern int BandRange1 = 1;
 extern int BandRange2 = 2;
 extern int BandRange3 = 3;
 
-
 double sma(m,n) = {p(m)+p(m+1)+p(m+2)+...+p(m+n-1)}/n; # m=0;now m=1, 1 day before, m=2 2days before
 
 double sd(m,n) = [[{p(m)-sma(m,n)}^2+{p(m+1)-sma(m,n)}^2+{p(m+2)-sma(m,n)}^2+...+{p(m+n-1)-sma(m,n)}^2]/n]^(1/2);
-
 
 bu(m,n,o) =  sma(m,n) + o * sd(m,n);
 bd(m,n,o) =  sma(m,n) - o * sd(m,n);
