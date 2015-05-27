@@ -1,4 +1,5 @@
-﻿#MACD
+﻿#RSI
+
 
 extern int FastEMAPeriod = 12;
 extern int SlowEMAPeriod = 26;
@@ -20,6 +21,31 @@ double SlowLine1 = 0;
 int start()
 {
 
+    double dif(m) = p(m) - p(m+1);
+
+    for( var i=0 ; i<n-1; i++){
+        if(dif(m + i) >= 0)
+        {
+        u(m+i) = dif(m+i);
+        d(m+i) = 0;
+        }
+        else
+        {
+        u(m+i) = 0;
+        d(m+i) = (-1) * dif(m+i);
+        }
+    }
+
+    for( var j=0 ; j < n-1; j++){
+        totalup(m) = totalup(m) + up(m+i)
+
+
+    }
+
+
+double TotalUp = 0;
+double TotalDown = 0;
+
     FastLine2 = MACD(2, FastEMAPeriod, SlowEMAPeriod);
     SlowLine2 = Signal(2, FastEMAPeriod, SlowEMAPeriod, SignalPeriod);
     FastLine1 = MACD(1, FastEMAPeriod, SlowEMAPeriod);
@@ -35,6 +61,6 @@ int start()
       {
          SignalSend SELL;
       }
-      
+
 return(0);
 }

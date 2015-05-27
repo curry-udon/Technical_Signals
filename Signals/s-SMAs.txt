@@ -19,12 +19,12 @@ int start() #When new candle bar happens, it will excute
    SlowLine1 = SMA(1, SlowMAPeriod);
 
       
-   //Send Signals 
+   //Send Signals # Golden cross
    if(   FastLine2 <= SlowLine2 && FastLine1 > SlowLine1)
       {
          SignalSend BUY;
       }
-      
+      # dead cross
    if(   FastLine2 >= SlowLine2 && FastLine1 < SlowLine1)
       {
          SignalSend SELL;
