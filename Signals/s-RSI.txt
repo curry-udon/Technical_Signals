@@ -1,17 +1,7 @@
 ﻿#RSI
 
-
-extern int FastEMAPeriod = 12;
-extern int SlowEMAPeriod = 26;
-extern int SignalPeriod = 9;
-
-double oldest_ema = p(oldest);
-
-double ema(m,n) = [2/(n+1)]*p(m) + [(n-1)/(n+1)] * ema(m+1,n);
-
-double MACD(m, n, l) = ema(m,n) - ema(m,l);
-double oldest_signal = 0;
-double Signal(m, n, l, k) = [2/(k+1)] * MACD(m, n, l) + [(k-1)/(k+1)] * MACD_Signal(m+1, n, l, k);
+extern int FastRSIPeriod = 9;
+extern int SlowRSIPeriod = 14;
 
 double FastLine2 = 0;
 double SlowLine2 = 0;
@@ -23,8 +13,8 @@ int start()
 
     double dif(m) = p(m) - p(m+1);
 
-    for( var i=0 ; i<n-1; i++){
-        if(dif(m + i) >= 0)
+    for( var i = 0 ; i < n-1; i++ ){
+        if( dif(m+i) >= 0)
         {
         u(m+i) = dif(m+i);
         d(m+i) = 0;
@@ -37,27 +27,24 @@ int start()
     }
 
     for( var j=0 ; j < n-1; j++){
-        totalup(m) = totalup(m) + up(m+i)
-
-
+        TotalUp(m, n) = TotalUp(m) + u(m+j);
+        TotalDown(m, n) = TotalDown(m) + d(m+j);
     }
 
+    double RSI(m, n) = TotalUp(m, n)/(TotalUp(m, n)+TotalDown(m, n))*100;
 
-double TotalUp = 0;
-double TotalDown = 0;
-
-    FastLine2 = MACD(2, FastEMAPeriod, SlowEMAPeriod);
-    SlowLine2 = Signal(2, FastEMAPeriod, SlowEMAPeriod, SignalPeriod);
-    FastLine1 = MACD(1, FastEMAPeriod, SlowEMAPeriod);
-    SlowLine1 = Signal(1, FastEMAPeriod, SlowEMAPeriod, SignalPeriod);
+    FastLine2 = RSI(2, FastRSIPeriod);
+    SlowLine2 = RSI(2, SlowRSIPeriod);
+    FastLine1 = RSI(1, FastRSIPeriod);
+    SlowLine1 = RSI(1, SlowRSIPeriod);
 
    //Send Signals # Golden cross
-   if( (FastLine2 <= SlowLine2 && FastLine1 > SlowLine1 && FastLine2 <= 0)|| (FastLine2 <= 0 && FastLine1 > 0) )
+   if( (FastLine2 <= SlowLine2 && FastLine1 > SlowLine1 && FastLine2 <= 30) || (FastLine2 <= 30 && FastLine1 > 30) || (FastLine2 <= 50 && FastLine1 > 50) )
       {
          SignalSend BUY;
       }
       # dead cross
-   if( ( FastLine2 >= SlowLine2 && FastLine1 < SlowLine1 && FastLine2 >= 0)|| (FastLine2 >= 0 && FastLine1 < 0) )
+   if( ( FastLine2 >= SlowLine2 && FastLine1 < SlowLine1 && FastLine2 >= 70) || (FastLine2 >= 70 && FastLine1 < 70) || (FastLine2 >= 50 && FastLine1 < 50) )
       {
          SignalSend SELL;
       }
