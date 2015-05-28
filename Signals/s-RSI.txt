@@ -31,7 +31,7 @@ int start()
         TotalDown(m, n) = TotalDown(m) + d(m+j);
     }
 
-    double RSI(m, n) = TotalUp(m, n)/(TotalUp(m, n)+TotalDown(m, n))*100;
+    double RSI(m, n) = （TotalUp(m, n)/(TotalUp(m, n)+TotalDown(m, n))）*100;
 
     FastLine2 = RSI(2, FastRSIPeriod);
     SlowLine2 = RSI(2, SlowRSIPeriod);
