@@ -1,0 +1,6 @@
+﻿#Simple Moving Average Definition
+
+extern int FastMAPeriod = 5;
+extern int SlowMAPeriod = 25;
+
+double SMA(m,n) = {p(m)+p(m+1)+p(m+2)+...+p(m+n-1)}/n; # m=0;now m=1, 1 day before, m=2 2days before
