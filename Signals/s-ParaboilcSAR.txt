@@ -1,40 +1,42 @@
-﻿#MACD
+﻿// Definition MAGIC Number YYYYMMDD
+#define MAGIC 20130627
 
-extern int FastEMAPeriod = 12;
-extern int SlowEMAPeriod = 26;
-extern int SignalPeriod = 9;
 
-double oldest_ema = p(oldest);
+//---- input parameters
+extern string Comments = "Parabolic";
+extern double    Step=0.02;
+extern double    Maximum=0.2;
+double SaR2 = 0;
+double SaR1 = 0;
 
-double ema(m,n) = [2/(n+1)]*p(m) + [(n-1)/(n+1)] * ema(m+1,n);
-
-double MACD(m, n, l) = ema(m,n) - ema(m,l);
-double oldest_signal = 0;
-double Signal(m, n, l, k) = [2/(k+1)] * MACD(m, n, l) + [(k-1)/(k+1)] * MACD_Signal(m+1, n, l, k);
-
-double FastLine2 = 0;
-double SlowLine2 = 0;
-double FastLine1 = 0;
-double SlowLine1 = 0;
 
 int start()
 {
 
-    FastLine2 = MACD(2, FastEMAPeriod, SlowEMAPeriod);
-    SlowLine2 = Signal(2, FastEMAPeriod, SlowEMAPeriod, SignalPeriod);
-    FastLine1 = MACD(1, FastEMAPeriod, SlowEMAPeriod);
-    SlowLine1 = Signal(1, FastEMAPeriod, SlowEMAPeriod, SignalPeriod);
+	
+	SaR2 = iSAR(NULL,0,Step,Maximum,2);
+	SaR1 = iSAR(NULL,0,Step,Maximum,1);
+ 
 
-   //Send Signals # Golden cross
-   if( (FastLine2 <= SlowLine2 && FastLine1 > SlowLine1 && FastLine2 <= 0)|| (FastLine2 <= 0 && FastLine1 > 0) )
-      {
-         SignalSend BUY;
-      }
-      # dead cross
-   if( ( FastLine2 >= SlowLine2 && FastLine1 < SlowLine1 && FastLine2 >= 0)|| (FastLine2 >= 0 && FastLine1 < 0) )
-      {
-         SignalSend SELL;
-      }
-      
+
+   if(BUYpos!=0 || SELLpos!=0)return(0);
+   /**/
+   //Open Buy Position
+   if(    Close[2] <= SaR2
+      &&  SaR1 <  Close[1]){
+      Print("Close[2]: ",Close[2], " <= SaR2: ",SaR2);
+      Print("SaR1: ", SaR1, " < Close[1]: ",Close[1]);
+      SendBuySignals;
+   }
+   /**/   
+
+   //Open Sell Position
+   if(    SaR2 <= Close[2]
+      &&  Close[1] <  SaR1){
+      Print("SaR2: ",SaR2, " <= Close[2]: ",Close[2]);
+      Print("Close[1]: ", Close[1], " < SaR1: ",SaR1);
+      SendSellSignal;
+   }
+   /**/
 return(0);
 }

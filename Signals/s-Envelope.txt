@@ -1,39 +1,65 @@
-﻿#MACD
+﻿
+// マジックナンバーの定義
+#define MAGIC 3986
 
-extern int FastEMAPeriod = 12;
-extern int SlowEMAPeriod = 26;
-extern int SignalPeriod = 9;
+// パラメーターの設定//
+extern int MA_Period=24;
+extern int MA_Shift=0;
+extern int MA_Method=0;
+extern int Applied_Price=0;
+extern double Deviation1=1.0;
+extern double Deviation2=1.5;
 
-double oldest_ema = p(oldest);
+// 変数の設定//
+int TicketL = 0; // 買い注文の結果をキャッチする変数
+int TicketS = 0; // 売り注文の結果をキャッチする変数
+int ExitL = 0; // 買いポジションの決済注文の結果をキャッチする変数
+int ExitS = 0; // 売りポジションの決済注文の結果をキャッチする変数
 
-double ema(m,n) = [2/(n+1)]*p(m) + [(n-1)/(n+1)] * ema(m+1,n);
 
-double MACD(m, n, l) = ema(m,n) - ema(m,l);
-double oldest_signal = 0;
-double Signal(m, n, l, k) = [2/(k+1)] * MACD(m, n, l) + [(k-1)/(k+1)] * MACD_Signal(m+1, n, l, k);
-
-double FastLine2 = 0;
-double SlowLine2 = 0;
-double FastLine1 = 0;
-double SlowLine1 = 0;
+double OuterP2 = 0;
+double OuterM2 = 0;
+double InnerP2 = 0;
+double InnerM2 = 0;
+double OuterP1 = 0;
+double OuterM1 = 0;
+double InnerP1 = 0;
+double InnerM1 = 0;
+double MA2 =0;
+double MA1 =0;
 
 int start()
 {
 
-    FastLine2 = MACD(2, FastEMAPeriod, SlowEMAPeriod);
-    SlowLine2 = Signal(2, FastEMAPeriod, SlowEMAPeriod, SignalPeriod);
-    FastLine1 = MACD(1, FastEMAPeriod, SlowEMAPeriod);
-    SlowLine1 = Signal(1, FastEMAPeriod, SlowEMAPeriod, SignalPeriod);
+ OuterP2 = iCustom(NULL,0,"Envelopes",MA_Period,MA_Shift,MA_Method,Applied_Price,Deviation2,0,2);
+ OuterM2 = iCustom(NULL,0,"Envelopes",MA_Period,MA_Shift,MA_Method,Applied_Price,Deviation2,1,2);
+ InnerP2 = iCustom(NULL,0,"Envelopes",MA_Period,MA_Shift,MA_Method,Applied_Price,Deviation1,0,2);
+ InnerM2 = iCustom(NULL,0,"Envelopes",MA_Period,MA_Shift,MA_Method,Applied_Price,Deviation1,1,2);
+ OuterP1 = iCustom(NULL,0,"Envelopes",MA_Period,MA_Shift,MA_Method,Applied_Price,Deviation2,0,1);
+ OuterM1 = iCustom(NULL,0,"Envelopes",MA_Period,MA_Shift,MA_Method,Applied_Price,Deviation2,1,1);
+ InnerP1 = iCustom(NULL,0,"Envelopes",MA_Period,MA_Shift,MA_Method,Applied_Price,Deviation1,0,1);
+ InnerM1 = iCustom(NULL,0,"Envelopes",MA_Period,MA_Shift,MA_Method,Applied_Price,Deviation1,1,1);
+ MA2 = iCustom(NULL,0,"Moving Averages",MA_Period,MA_Shift,MA_Method,0,2);
+ MA1 = iCustom(NULL,0,"Moving Averages",MA_Period,MA_Shift,MA_Method,0,1);
 
-   //Send Signals # Golden cross
-   if( (FastLine2 <= SlowLine2 && FastLine1 > SlowLine1 && FastLine2 <= 0)|| (FastLine2 <= 0 && FastLine1 > 0) )
+
+      
+   // 買いエントリー
+   if(    Close[2] <= InnerM2
+      &&  InnerM1 < Close[1]
+      &&  Close[1] <=  MA1
+     )
       {
-         SignalSend BUY;
+         SendBuySignal;
       }
-      # dead cross
-   if( ( FastLine2 >= SlowLine2 && FastLine1 < SlowLine1 && FastLine2 >= 0)|| (FastLine2 >= 0 && FastLine1 < 0) )
+      
+   // 売りエントリー
+   if(    InnerP2 <= Close[2]
+      &&  Close[1] < InnerP1
+      &&  MA1 <= Close[1]
+     )
       {
-         SignalSend SELL;
+         SendSellSignal;
       }
       
 return(0);
