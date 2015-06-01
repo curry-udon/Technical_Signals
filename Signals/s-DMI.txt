@@ -1,0 +1,54 @@
+﻿
+// マジックナンバーの定義
+#define MAGIC 3986
+
+// パラメーターの設定//
+extern int parameter1=240; //ADXPeriod=240
+
+extern string Comments = "DMI";
+
+
+// 変数の設定//
+int TicketL = 0; // 買い注文の結果をキャッチする変数
+int TicketS = 0; // 売り注文の結果をキャッチする変数
+int ExitL = 0; // 買いポジションの決済注文の結果をキャッチする変数
+int ExitS = 0; // 売りポジションの決済注文の結果をキャッチする変数
+
+
+double pDI2 = 0;
+double mDI2 = 0;
+double pDI1 = 0;
+double mDI1 = 0;
+
+
+
+int start()
+{
+
+
+ pDI2 = iCustom(NULL,0,"ADX",parameter1,1,2);
+ mDI2 = iCustom(NULL,0,"ADX",parameter1,2,2);
+ pDI1 = iCustom(NULL,0,"ADX",parameter1,1,1);
+ mDI1 = iCustom(NULL,0,"ADX",parameter1,2,1);
+
+      
+      
+   // 買いエントリー
+   if(    pDI2 <= mDI2
+      &&  mDI1 <  pDI1
+      )
+      {
+         SendBuySignal;
+      }
+      
+   // 売りエントリー
+   if(    mDI2 <= pDI2
+      &&  pDI1 <  mDI1
+      )
+      {
+         SendSellSignal;
+      }
+      /**/
+      
+return(0);
+}
